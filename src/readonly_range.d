@@ -1,4 +1,4 @@
-module ro_slice;
+module readonly_range;
 
 ///
 public import std.range.primitives: back, empty, front, popBack, popFront, save;
@@ -25,10 +25,10 @@ private struct _Indices(A, B) {
 
 /++
     A thin wrapper that makes the range `R` head-const (aka read-only, aka final):
-    [hasReadonlyElements]`!(RoRange!R)` is `true` for any `R`. If `R` is already head-const,
-    `RoRange` aliases itself to it.
+    [hasReadonlyElements]`!(ReadonlyRange!R)` is `true` for any `R`. If `R` is already head-const,
+    `ReadonlyRange` aliases itself to it.
 +/
-struct RoRange(R) if (isInputRange!R && !hasReadonlyElements!R) {
+struct ReadonlyRange(R) if (isInputRange!R && !hasReadonlyElements!R) {
 pragma(inline, true):
     import std.range.primitives: ElementType, hasLength, isBidirectionalRange, isForwardRange;
 
@@ -59,7 +59,7 @@ pragma(inline, true):
 
     static if (isForwardRange!R) {
         /// ditto
-        @property RoRange!R save() { return RoRange!R(_r.save); }
+        @property ReadonlyRange!R save() { return ReadonlyRange!R(_r.save); }
     }
 
     static if (hasLength!R) {
@@ -103,17 +103,17 @@ pragma(inline, true):
     auto opIndex(Args...)(auto ref Args indices) {
         // See the comment for `opSlice` above.
         static if (!Args.length)
-            return RoRange!R(_r[ ]);
+            return ReadonlyRange!R(_r[ ]);
         else static if (is(Args[0] == _Indices!(A, B), A, B))
             static if (Args.length == 1) // Unfortunately, this check is required.
-                return readonly(_r[indices[0].a .. indices[0].b]);
+                return readonlyRange(_r[indices[0].a .. indices[0].b]);
             else
-                return readonly(_r[indices[0].a .. indices[0].b, indices[1 .. $]]);
+                return readonlyRange(_r[indices[0].a .. indices[0].b, indices[1 .. $]]);
         else
             return _r[indices];
     }
 
-    /// `RoRange!R` is implicitly convertible to `const R` (i.e., head-const to deep-const).
+    /// `ReadonlyRange!R` is implicitly convertible to `const R` (i.e., head-const to deep-const).
     T opCast(T)() const if (is(T == const R)) { return _r; }
 
     /// ditto
@@ -122,15 +122,15 @@ pragma(inline, true):
 }
 
 /// ditto
-template RoRange(R) if (hasReadonlyElements!R) {
-    alias RoRange = R;
+template ReadonlyRange(R) if (hasReadonlyElements!R) {
+    alias ReadonlyRange = R;
 }
 
 /// ditto
 pragma(inline, true)
-RoRange!R readonly(R)(R r) if (isInputRange!R) {
+ReadonlyRange!R readonlyRange(R)(R r) if (isInputRange!R) {
     static if (hasReadonlyElements!R)
         return r;
     else
-        return RoRange!R(r);
+        return ReadonlyRange!R(r);
 }

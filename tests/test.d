@@ -1,4 +1,4 @@
-import ro_slice;
+import readonly_range;
 
 nothrow pure @safe @nogc:
 
@@ -10,14 +10,14 @@ unittest {
 }
 
 unittest {
-    static assert(is(RoRange!string == string));
-    static assert(is(RoRange!(char[ ]) == struct));
-    static assert(!__traits(compiles, RoRange!char));
+    static assert(is(ReadonlyRange!string == string));
+    static assert(is(ReadonlyRange!(char[ ]) == struct));
+    static assert(!__traits(compiles, ReadonlyRange!char));
 }
 
 unittest {
     int[3] data = [1, 2, 3];
-    auto a = data[ ].readonly;
+    auto a = data[ ].readonlyRange;
     assert(!a.empty);
     assert(a.length == 3);
     assert(a.front == 1);
@@ -26,8 +26,8 @@ unittest {
     assert(a[ ] == data[ ]);
     assert(a <= a);
 
-    static assert(is(typeof(a[ ]) == RoRange!(int[ ])));
-    static assert(is(typeof(a[0 .. 0]) == RoRange!(int[ ])));
+    static assert(is(typeof(a[ ]) == ReadonlyRange!(int[ ])));
+    static assert(is(typeof(a[0 .. 0]) == ReadonlyRange!(int[ ])));
 
     static assert(!__traits(compiles, a.front = 0));
     static assert(!__traits(compiles, a.back = 0));
@@ -56,7 +56,7 @@ unittest {
     Point[1] data = [
         { x: 1, y: 2 },
     ];
-    auto p = data[ ].readonly;
+    auto p = data[ ].readonlyRange;
     static assert(hasReadonlyElements!(typeof(p)));
 }
 
@@ -67,7 +67,7 @@ unittest {
 
     auto a = iota(10).filter!q{a & 0x1};
     static assert(!isRandomAccessRange!(typeof(a)));
-    static assert(is(typeof(a.readonly) == typeof(a)));
+    static assert(is(typeof(a.readonlyRange) == typeof(a)));
 }
 
 unittest {
@@ -103,7 +103,7 @@ unittest {
     static assert(!hasReadonlyElements!Forever);
 
     int x = 5;
-    auto a = Forever((() @trusted => &x)()).readonly;
+    auto a = Forever((() @trusted => &x)()).readonlyRange;
     alias R = typeof(a);
     static assert(isForwardRange!R);
     static assert(isRandomAccessRange!R);
@@ -119,6 +119,6 @@ unittest {
 
 unittest {
     char[5] msg = "hello";
-    auto a = msg[ ].readonly;
+    auto a = msg[ ].readonlyRange;
     static assert(!__traits(compiles, { a[4] = '!'; }));
 }
