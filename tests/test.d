@@ -2,6 +2,8 @@ import readonly_range;
 
 nothrow pure @safe @nogc:
 
+extern(C) __gshared string[ ] rt_options = ["covopt=dstpath:cov"];
+
 unittest {
     static assert(hasReadonlyElements!(const(int)[ ]));
     static assert(hasReadonlyElements!(const(char)[ ]));
