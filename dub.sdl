@@ -1,0 +1,14 @@
+name        "ro_slice"
+description "A 1-dimensional head-const (aka read-only, aka final) slice."
+authors     "Nickolay Bukreyev"
+copyright   "Copyright © 2024, Nickolay Bukreyev"
+license     "MIT"
+
+targetPath "build"
+
+configuration "library"
+
+configuration "unittest" {
+    sourcePaths "test"
+    importPaths "test"
+}
